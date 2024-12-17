@@ -7,30 +7,6 @@
 local PlayersBansModule = {}
 
 
-local function convertTimeToSeconds(expression)
-  local timeUnit = string.sub(expression, -1):lower()       -- Get the last character of the string
-  local timeValue = tonumber(string.sub(expression, 1, -2)) -- Get the value of the string without the last character (time unit)
-
-  if not timeValue or timeValue <= 0 then
-    return nil, "Invalid time value. Use expressions like 1a, 1d, 1h, 1m"
-  end
-
-  local seconds = 0
-  if timeUnit == "m" then
-    seconds = timeValue * 60       -- minutes
-  elseif timeUnit == "h" then
-    seconds = timeValue * 3600     -- hours
-  elseif timeUnit == "d" then
-    seconds = timeValue * 86400    -- days
-  elseif timeUnit == "a" then
-    seconds = timeValue * 31536000 -- years
-  else
-    return nil, "Invalid time unit. Use 'a', 'd', 'h', 'm'"
-  end
-
-  return seconds
-end
-
 --- Ban a player by id
 --- @param player_id number player id
 --- @param reason string reason
@@ -41,7 +17,7 @@ function PlayersBansModule.Add(player_id, reason, duration)
   local expiration = nil
 
   if duration then
-    local seconds, err = convertTimeToSeconds(duration)
+    local seconds, err = Utils:convertTimeToSeconds(duration)
     if err then
       lib.print.error(err)
       return nil

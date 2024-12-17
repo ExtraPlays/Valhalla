@@ -30,10 +30,17 @@ AddEventHandler("playerConnecting", function(name, _, deferrals)
 
   if bansModule.Check(player.id) then
     local ban = bansModule.Get(player.id)
-    local banReason = ban.reason or "Sem motivo especificado."
-    local banExpiration = ban.expiration == 0 and "Permanente" or os.date("%d/%m/%Y %H:%M:%S", ban.expiration)
 
-    return deferrals.done(("Você está banido do servidor. Motivo: %s. Expira em: %s."):format(banReason, banExpiration))
+    local banReason = ban.reason or "Sem motivo especificado."
+    local banExpiration
+    if ban.expiration and ban.expiration > 0 then
+      banExpiration = os.date("%d/%m/%Y %H:%M:%S", math.floor(ban.expiration / 1000))
+    else
+      banExpiration = "Permanente"
+    end
+
+    return deferrals.done(("Você está banido do servidor. \t\nMotivo: %s. \t\nExpira em: %s."):format(banReason,
+      banExpiration))
   end
 
   if not player.allowlist then

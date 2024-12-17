@@ -14,10 +14,12 @@ local PlayersBansModule = {}
 --- @return unknown
 function PlayersBansModule.Add(player_id, reason, duration)
   local reason = reason or "No reason provided."
-  local expiration = nil
+  local expiration = "NULL"
 
   if duration then
     local seconds, err = Utils:convertTimeToSeconds(duration)
+
+    lib.print.error(seconds)
     if err then
       lib.print.error(err)
       return nil
@@ -25,14 +27,14 @@ function PlayersBansModule.Add(player_id, reason, duration)
     expiration = ("DATE_ADD(NOW(), INTERVAL %d SECOND)"):format(seconds)
   end
 
-  local query = [[
-    INSERT INTO players_bans (player_id, reason, expiration)
-    VALUES (?, ?, %s)
-  ]]
+  -- Monta a query SQL final
+  local query = string.format(
+    "INSERT INTO players_bans (player_id, reason, expiration) VALUES (?, ?, %s)",
+    expiration
+  )
 
-  query = expiration and query:format("DATE_ADD(NOW(), INTERVAL ? SECOND)") or query:format("NULL")
-
-  return MySQL.insert.await(query, { player_id, reason, expiration })
+  -- Executa a query
+  return MySQL.insert.await(query, { player_id, reason })
 end
 
 --- Get the ban of a player
@@ -50,27 +52,24 @@ function PlayersBansModule.Check(player_id)
 
   -- If the ban exists and the expiration is 0, then the player is banned.
   if ban then
-    if ban.expiration == 0 then
+    local expiration = ban.expiration or 0
+    local expirationInSeconds = math.floor(expiration / 1000)
+    if expirationInSeconds == 0 or expirationInSeconds > os.time() then
       return true
     else
-      -- If the expiration is greater than the current time, then the player is banned.
-      if ban.expiration > os.time() then
-        return true
-      else
-        PlayersBansModule.Remove(player_id)
-        return false
-      end
+      PlayersBansModule.Remove(player_id)
+      return false
     end
-  else
-    return false
   end
+
+  return false
 end
 
 --- Remove a ban from a player
 --- @param player_id number player id
 --- @return unknown
 function PlayersBansModule.Remove(player_id)
-  return MySQL.delete.await('DELETE FROM players_bans WHERE player_id = ?', { player_id })
+  return MySQL.update.await('DELETE FROM players_bans WHERE player_id = ?', { player_id })
 end
 
 return PlayersBansModule

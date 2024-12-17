@@ -36,6 +36,10 @@ AddEventHandler("playerConnecting", function(name, _, deferrals)
     return deferrals.done(("Você está banido do servidor. Motivo: %s. Expira em: %s."):format(banReason, banExpiration))
   end
 
+  if not player.allowlist then
+    return deferrals.done("Você não possui acesso ao servidor, solicite a liberação. Seu id: " .. player.id)
+  end
+
   tmp_players[steamIdentifier] = player
   deferrals.done()
 end)

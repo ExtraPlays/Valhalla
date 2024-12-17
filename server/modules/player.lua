@@ -1,6 +1,6 @@
 --- [[
 ---
---- This file contains all the player related functions.
+--- This module contains all the player related functions.
 ---
 --- ]]
 

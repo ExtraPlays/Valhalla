@@ -1,7 +1,6 @@
 --- FIXME: CASO NAO FUNCIONE ALTERE PARA lib.require("server.modules.player")
 local playerModule = require("server.modules.player")
-
-lib.print.info(playerModule)
+local bansModule = require("server.modules.players_bans")
 
 RegisterCommand("createPlayer", function(source, args)
   local license = "license:fake"
@@ -45,4 +44,31 @@ RegisterCommand("updatePlayer", function(source, args)
   player.lastname = "Barbosa"
 
   lib.print.info(playerModule.Update(id, player))
+end, false)
+
+RegisterCommand("testBan", function(source, args)
+  local id = args[1]
+  local player = playerModule.Get(id)
+
+  if not player then
+    lib.print.error("Player not found")
+    return
+  end
+
+  local duration = args[2]
+  local reason = args[3]
+
+  lib.print.info(bansModule.Add(id, reason, duration))
+end, false)
+
+RegisterCommand("testUnban", function(source, args)
+  local id = args[1]
+  local player = playerModule.Get(id)
+
+  if not player then
+    lib.print.error("Player not found")
+    return
+  end
+
+  lib.print.info(bansModule.Remove(id))
 end, false)

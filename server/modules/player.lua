@@ -30,7 +30,7 @@ function PlayerModule.GetAllFromUser(license)
   local players = MySQL.query.await('SELECT * FROM players WHERE license = ?', { license })
   for k, v in next, players do
     players[k].groups = v.groups and json.decode(v.groups) or { 'user' }
-    players[k].skin = v.skin and json.decode(v.skin) or { model = 'mp_m_freemode_01', drawables = {}, textures = {} }
+    players[k].skin = v.skin and json.decode(v.skin) or { Config.DefaultSkin }
     players[k].metadata = v.metadata and json.decode(v.metadata) or {}
   end
   return players

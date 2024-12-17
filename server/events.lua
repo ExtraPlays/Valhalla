@@ -1,4 +1,5 @@
 local playerModule = require("server.modules.player")
+local bansModule = require("server.modules.players_bans")
 
 local players = {}
 local tmp_players = {}
@@ -25,6 +26,14 @@ AddEventHandler("playerConnecting", function(name, _, deferrals)
 
   if not player then
     return deferrals.done("Você não possui uma conta no servidor. Crie uma conta no site.")
+  end
+
+  if bansModule.Check(player.id) then
+    local ban = bansModule.Get(player.id)
+    local banReason = ban.reason or "Sem motivo especificado."
+    local banExpiration = ban.expiration == 0 and "Permanente" or os.date("%d/%m/%Y %H:%M:%S", ban.expiration)
+
+    return deferrals.done(("Você está banido do servidor. Motivo: %s. Expira em: %s."):format(banReason, banExpiration))
   end
 
   tmp_players[steamIdentifier] = player

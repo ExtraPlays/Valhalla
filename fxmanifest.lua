@@ -11,7 +11,8 @@ use_fxv2_oal 'true'
 
 shared_scripts {
   '@ox_lib/init.lua',
-  'shared/config.lua'
+  'shared/config.lua',
+  'shared/utils.lua',
 }
 
 server_scripts {

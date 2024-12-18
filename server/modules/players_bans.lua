@@ -6,7 +6,6 @@
 
 local PlayersBansModule = {}
 
-
 --- Ban a player by id
 --- @param player_id number player id
 --- @param reason string reason
@@ -18,8 +17,6 @@ function PlayersBansModule.Add(player_id, reason, duration)
 
   if duration then
     local seconds, err = Utils:convertTimeToSeconds(duration)
-
-    lib.print.error(seconds)
     if err then
       lib.print.error(err)
       return nil

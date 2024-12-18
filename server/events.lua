@@ -82,15 +82,15 @@ AddEventHandler("playerJoining", function()
 
   players[src] = tmp_players[steamIdentifier]
   players[src].actived = false
-
-  Citizen.Wait(1000)
-
   tmp_players[steamIdentifier] = nil
 
-  TriggerEvent("playerSpawn", src)
   lib.print.info(("Jogador %s conectado ao servidor."):format(players[src].firstname))
-end)
 
+  --TriggerEvent("playerSpawn", src)
+  -- FIXME: CORRIGIR
+  TriggerClientEvent("core:client:update_skin", src, players[src].skin)
+  players[src].actived = true
+end)
 
 --- CUSTOM EVENTS
 --- TODO: Criar eventos customizados
@@ -99,8 +99,17 @@ end)
 AddEventHandler('playerSpawn', function()
   -- Ped do jogador criado no client
   local src = source
-  TriggerClientEvent("core:client:update_skin", src, players[src])
-  players[src].actived = true
+  if not players[src] then
+    DropPlayer(src, "Erro ao carregar os dados do jogador. Tente novamente ou entre em contato com o suporte.")
+    return
+  end
+
+  if not players[src].actived then
+    TriggerClientEvent("core:client:update_skin", src, players[src].skin)
+    players[src].actived = true
+  else
+    lib.print.error(("Erro: Jogador %s já está ativo."):format(players[src].firstname))
+  end
 end)
 
 
